@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Salvo.Models;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,18 @@ namespace Salvo.Repositories
         public void Update(T entity)
         {
             this.RepositoryContext.Set<T>().Update(entity);
+        }
+
+        public IQueryable<T> FindAll(Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null)
+        {
+            IQueryable<T> queryable = this.RepositoryContext.Set<T>();
+
+            if (includes != null)
+            {
+                queryable = includes(queryable);
+            }
+
+            return queryable.AsNoTracking();
         }
     }
 }
