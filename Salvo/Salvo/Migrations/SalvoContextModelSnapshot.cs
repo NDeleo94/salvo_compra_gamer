@@ -80,6 +80,46 @@ namespace Salvo.Migrations
                     b.ToTable("Players");
                 });
 
+            modelBuilder.Entity("Salvo.Models.Ship", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("GamePlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamePlayerId");
+
+                    b.ToTable("Ships");
+                });
+
+            modelBuilder.Entity("Salvo.Models.ShipLocation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ShipId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShipId");
+
+                    b.ToTable("ShipLocations");
+                });
+
             modelBuilder.Entity("Salvo.Models.GamePlayer", b =>
                 {
                     b.HasOne("Salvo.Models.Game", "Game")
@@ -99,14 +139,46 @@ namespace Salvo.Migrations
                     b.Navigation("Player");
                 });
 
+            modelBuilder.Entity("Salvo.Models.Ship", b =>
+                {
+                    b.HasOne("Salvo.Models.GamePlayer", "GamePlayer")
+                        .WithMany("Ships")
+                        .HasForeignKey("GamePlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GamePlayer");
+                });
+
+            modelBuilder.Entity("Salvo.Models.ShipLocation", b =>
+                {
+                    b.HasOne("Salvo.Models.Ship", "Ship")
+                        .WithMany("Locations")
+                        .HasForeignKey("ShipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ship");
+                });
+
             modelBuilder.Entity("Salvo.Models.Game", b =>
                 {
                     b.Navigation("GamePlayers");
                 });
 
+            modelBuilder.Entity("Salvo.Models.GamePlayer", b =>
+                {
+                    b.Navigation("Ships");
+                });
+
             modelBuilder.Entity("Salvo.Models.Player", b =>
                 {
                     b.Navigation("GamePlayers");
+                });
+
+            modelBuilder.Entity("Salvo.Models.Ship", b =>
+                {
+                    b.Navigation("Locations");
                 });
 #pragma warning restore 612, 618
         }
