@@ -17,10 +17,6 @@ namespace Salvo.Controllers
     public class GamesController : ControllerBase
     {
         private IGameRepository _repository;
-        public GamesController(IGameRepository repository)
-        {
-            _repository = repository;
-        }
         // GET: api/<GamesController>
         [HttpGet]
         [AllowAnonymous]
@@ -58,6 +54,5 @@ namespace Salvo.Controllers
             }
             
         }
-
     }
 }

@@ -27,6 +27,7 @@
                 </ul>
                 <span id="user-name" v-if="player != 'Guest'">{{ player }} </span>
                 <form id="login-form" class="form-inline my-2 my-lg-0">
+					<input v-model:value="name" class="form-control mr-sm-2" type="text" placeholder="Name" aria-label="Name">
                     <input v-model:value="email" class="form-control mr-sm-2" type="email" placeholder="Email" aria-label="Email">
                     <input v-model:value="password" class="form-control mr-sm-2" type="password" placeholder="Contrase&ntilde;a" aria-label="Contraseña">
                     <button v-on:click="login" id="login-btn" class="btn btn-outline-success my-2 my-sm-0" type="button">Login</button>

@@ -3,6 +3,7 @@
     data: {
         games: [],
         scores: [],
+		name: "",
         email: "",
         password: "",
         modal: {
@@ -39,6 +40,7 @@
             if (show) {
                 $("#login-form").show();
                 $("#login-form").trigger("reset");
+				this.name = "";
                 this.email = "";
                 this.password = "";
             }
@@ -59,7 +61,7 @@
         },
         login: function(event){
             axios.post('/api/auth/login', {
-                email: this.email, password: this.password
+                name: this.name, email: this.email, password: this.password
             })
                 .then(result => {
                     if (result.status == 200) {
@@ -83,7 +85,7 @@
         },
         signin: function (event) {
             axios.post('/api/players', {
-                email: this.email, password: this.password
+                name: this.name, email: this.email, password: this.password
             })
                 .then(result => {
                     if (result.status == 201) {
