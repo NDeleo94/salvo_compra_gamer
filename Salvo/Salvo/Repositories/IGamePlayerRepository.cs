@@ -10,5 +10,6 @@ namespace Salvo.Repositories
     {
         GamePlayer GetGamePlayerView(long IdGamePlayer);
         void Save(GamePlayer gamePlayer);
+        GamePlayer FindById(long id);
     }
 }
