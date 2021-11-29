@@ -125,5 +125,64 @@ namespace Salvo.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("{id}/salvos")]
+        public IActionResult Post(long id, [FromBody] SalvoDTO salvo)
+        {
+            try
+            {
+                //Buscamos el email logueado
+                string email = User.FindFirst("Player") != null ? User.FindFirst("Player").Value : "Guest";
+                Player player = _playerRepository.FindByEmail(email);
+
+                //Buscamos el gameplayer
+                GamePlayer gamePlayer = _repository.FindById(id);
+
+                //Validamos el gameplayer (null)
+                if (gamePlayer == null)
+                    return StatusCode(403, "No existe el juego");
+
+                //Validamos si el usuario se encuentra en el juego
+                if (gamePlayer.Player.Id != player.Id)
+                    return StatusCode(403, "El usuario no se encuentra en el juego");
+
+                //Buscamos al oponente
+                GamePlayer opponentGamePlayer = gamePlayer.getOpponent();
+
+                if (gamePlayer.Game.GamePlayers.Count() != 2)
+                    return StatusCode(403, "NO HAY A QUIEN DISPARAR!!!");
+
+                opponentGamePlayer = _repository.FindById(opponentGamePlayer.Id);
+
+                int playerTurn = 0;
+                int opponentTurn = 0;
+
+                playerTurn = gamePlayer.Salvos != null ? gamePlayer.Salvos.Count() + 1 : 1;
+
+                if (opponentGamePlayer != null)
+                    opponentTurn = opponentGamePlayer.Salvos != null ? opponentGamePlayer.Salvos.Count() : 0;
+
+                if ((playerTurn - opponentTurn) < -1 || (playerTurn - opponentTurn) > 1)
+                    return StatusCode(403, "No se puede adelantar el turno");
+
+                gamePlayer.Salvos.Add(new Salvo.Models.Salvo
+                {
+                    GamePlayerId = gamePlayer.Id,
+                    Turn = playerTurn,
+                    Locations = salvo.Locations.Select(location => new SalvoLocation
+                    {
+                        SalvoId = salvo.Id,
+                        Location = location.Location
+                    }).ToList()
+                });
+
+                _repository.Save(gamePlayer);
+                return StatusCode(201);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
