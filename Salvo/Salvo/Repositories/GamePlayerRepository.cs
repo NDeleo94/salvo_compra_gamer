@@ -17,8 +17,12 @@ namespace Salvo.Repositories
                 .Include(gp => gp.Game)
                     .ThenInclude(game => game.GamePlayers)
                         .ThenInclude(gp => gp.Salvos)
+                .Include(gp => gp.Game)
+                    .ThenInclude(game => game.GamePlayers)
+                        .ThenInclude(gp => gp.Ships)
                 .Include(gp => gp.Player)
                 .Include(gp => gp.Ships)
+                .Include(gp => gp.Salvos)
                 .FirstOrDefault();
         }
 
