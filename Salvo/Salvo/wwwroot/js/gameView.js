@@ -108,7 +108,11 @@ var app = new Vue({
             if (this.salvoCount == 5) {
                 var cellsArray = [];
                 $(".salvo.shoot").each(function () {
-                    cellsArray.push({ id: 0, location: $(this).attr("id") });
+					if(!$(this).hasClass("shooted")){
+						cellsArray.push({ id: 0, location: $(this).attr("id") });
+						$(this).removeClass('shoot');
+					}
+                    
                 })
                 var salvo = new Object();
                 salvo.id = 0;
