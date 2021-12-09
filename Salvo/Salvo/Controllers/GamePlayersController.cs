@@ -18,10 +18,13 @@ namespace Salvo.Controllers
     {
         private IGamePlayerRepository _repository;
         private IPlayerRepository _playerRepository;
-        public GamePlayersController(IGamePlayerRepository repository, IPlayerRepository playerRepository)
+        private IScoreRepository _scoreRepository;
+        public GamePlayersController(IGamePlayerRepository repository, IPlayerRepository playerRepository, 
+            IScoreRepository scoreRepository)
         {
             _repository = repository;
             _playerRepository = playerRepository;
+            _scoreRepository = scoreRepository;
         }
 
         // GET api/<GamePlayersController>/5
@@ -77,9 +80,10 @@ namespace Salvo.Controllers
                         }).ToList()
                     })).ToList(),
                     Hits = gp.GetHits(),
-                    HitsOpponent = gp.getOpponent()?.GetHits(),
+                    HitsOpponent = gp.GetOpponent()?.GetHits(),
                     Sunks = gp.GetSunks(),
-                    SunksOpponent = gp.getOpponent()?.GetSunks()
+                    SunksOpponent = gp.GetOpponent()?.GetSunks(),
+                    GameState = Enum.GetName(typeof(GameState), gp.GetGameState())  
                 };
 
                 return Ok(gameView);
@@ -150,29 +154,40 @@ namespace Salvo.Controllers
                 if (gamePlayer.Player.Id != player.Id)
                     return StatusCode(403, "El usuario no se encuentra en el juego");
 
+                //Obtenemos el gameState
+                GameState gameState = gamePlayer.GetGameState();
+                if (gameState == GameState.LOSS || gameState == GameState.WIN || gameState == GameState.TIE)
+                    return StatusCode(403, "El juego termino");
+
                 //Buscamos al oponente
-                GamePlayer opponentGamePlayer = gamePlayer.getOpponent();
+                GamePlayer opponentGamePlayer = gamePlayer.GetOpponent();
 
                 if (gamePlayer.Game.GamePlayers.Count() != 2)
                     return StatusCode(403, "NO HAY A QUIEN DISPARAR!!!");
 
                 opponentGamePlayer = _repository.FindById(opponentGamePlayer.Id);
 
-                int playerTurn = 0;
-                int opponentTurn = 0;
+                //int playerTurn = 0;
+                //int opponentTurn = 0;
 
-                playerTurn = gamePlayer.Salvos != null ? gamePlayer.Salvos.Count() + 1 : 1;
+                //playerTurn = gamePlayer.Salvos != null ? gamePlayer.Salvos.Count() + 1 : 1;
 
-                if (opponentGamePlayer != null)
-                    opponentTurn = opponentGamePlayer.Salvos != null ? opponentGamePlayer.Salvos.Count() : 0;
+                //if (opponentGamePlayer != null)
+                //    opponentTurn = opponentGamePlayer.Salvos != null ? opponentGamePlayer.Salvos.Count() : 0;
 
-                if ((playerTurn - opponentTurn) < -1 || (playerTurn - opponentTurn) > 1)
+                //if ((playerTurn - opponentTurn) < -1 || (playerTurn - opponentTurn) > 1)
+                //    return StatusCode(403, "No se puede adelantar el turno");
+
+                if (gamePlayer.Salvos.Count > opponentGamePlayer.Salvos.Count)
+                    return StatusCode(403, "No se puede adelantar el turno");
+
+                if((gamePlayer.Salvos.Count == opponentGamePlayer.Salvos.Count) && gamePlayer.JoinDate > opponentGamePlayer.JoinDate)
                     return StatusCode(403, "No se puede adelantar el turno");
 
                 gamePlayer.Salvos.Add(new Salvo.Models.Salvo
                 {
                     GamePlayerId = gamePlayer.Id,
-                    Turn = playerTurn,
+                    Turn = gamePlayer.Salvos.Count + 1,
                     Locations = salvo.Locations.Select(location => new SalvoLocation
                     {
                         SalvoId = salvo.Id,
@@ -181,6 +196,68 @@ namespace Salvo.Controllers
                 });
 
                 _repository.Save(gamePlayer);
+
+                gameState = gamePlayer.GetGameState();
+
+                if(gameState == GameState.WIN)
+                {
+                    Score score = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = gamePlayer.PlayerId,
+                        Point = 1
+                    };
+                    _scoreRepository.Save(score);
+
+                    Score scoreOpponent = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = opponentGamePlayer.PlayerId,
+                        Point = 0
+                    };
+                    _scoreRepository.Save(scoreOpponent);
+                }
+                else if (gameState == GameState.LOSS)
+                {
+                    Score score = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = gamePlayer.PlayerId,
+                        Point = 0
+                    };
+                    _scoreRepository.Save(score);
+                    Score scoreOpponent = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = opponentGamePlayer.PlayerId,
+                        Point = 1
+                    };
+                    _scoreRepository.Save(scoreOpponent);
+                }
+                else if (gameState == GameState.TIE)
+                {
+                    Score score = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = gamePlayer.PlayerId,
+                        Point = 0.5
+                    };
+                    _scoreRepository.Save(score);
+
+                    Score scoreOpponent = new Score
+                    {
+                        FinishDate = DateTime.Now,
+                        GameId = gamePlayer.GameId,
+                        PlayerId = opponentGamePlayer.PlayerId,
+                        Point = 0.5
+                    };
+                    _scoreRepository.Save(scoreOpponent);
+                }
                 return StatusCode(201);
             }
             catch(Exception ex)
