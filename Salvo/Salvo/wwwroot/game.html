@@ -19,7 +19,7 @@
     <div id="app">
         <!-- Image and text -->
         <nav class="navbar navbar-light bg-light">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="index.html">
                 <img src="img/target.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
                 Salvo
                 <div id="playersList">
@@ -27,7 +27,21 @@
                     <span v-if="opponent.email != null"> vs {{ opponent.email }}</span>
                 </div>
             </a>
+			<button id="btnReproducir" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">
+			<img id="dalePlay" src="img/mute.png" width="30" height="30"></img>
+			</button>
+			
             <button v-on:click="logout" id="logout-btn" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">Logout</button>
+			
+			<!-- <button id="btnPausar" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button"> -->
+			<!-- <img src="img/target.jpg" width="30" height="30"></img> -->
+			<!-- </button> -->
+			
+			<!-- <button id="btnReiniciar" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button"> -->
+			<!-- <img src="img/targetself.png" width="30" height="30"></img> -->
+			<!-- </button> -->
+			
+			<audio src="music/Battleship.mp3" preload="auto" controls="none" style="display:none"></audio>
         </nav>
         <div class="container mt-2">
             <div class="row mb-3">
@@ -291,5 +305,6 @@
     <script src="dist/gridstack.jQueryUI.js"></script>
     <script src="dist/jquery.ui.touch-punch.min.js"></script>
     <script src="js/gameView.js"></script>
+	<script src="js/musiquita.js"></script>
 </body>
 </html>
