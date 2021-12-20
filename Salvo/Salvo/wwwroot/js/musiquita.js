@@ -10,8 +10,10 @@ const cargarSonido = function (fuente) {
 };
 
 const $botonReproducir = document.querySelector("#btnReproducir"),
-    $botonPausar = document.querySelector("#btnPausar"),
-    $botonReiniciar = document.querySelector("#btnReiniciar");
+    $botonBajar = document.querySelector("#btnBajarVol"),
+    $botonSubir = document.querySelector("#btnSubirVol");
+	
+let imagen = document.getElementById('dalePlay');
 	
 // El sonido que podemos reproducir o pausar
 const sonido = cargarSonido("music/Battleship.mp3");
@@ -21,29 +23,32 @@ let playing = 0;
 $botonReproducir.onclick = () => {
 	if(playing == 0){
 		sonido.play();
-    sonido.muted = false;
+		sonido.muted = false;
 		playing = 1;
 	}
 	else{
 		//sonido.pause();
-    sonido.muted = true;
+		sonido.muted = true;
 		playing = 0;
 	}
 	
 	FbotonOn();
 };
-
-$botonPausar.onclick = () => {
-	// if(sonido.volume > 0){
-	// sonido.volume-= 0.25};
-	// }
-	if(sonido.volume > 0)
+$botonBajar.onclick = () => {
+    if(sonido.volume > 0)
 		sonido.volume -= 0.25;
+	if(sonido.volume == 0){
+		sonido.muted = true;
+	}
+	FbotonOn();
 };
-
-$botonReiniciar.onclick = () => {
+$botonSubir.onclick = () => {
     if(sonido.volume < 1)
 		sonido.volume += 0.25;
+	if(sonido.volume != 0){
+		sonido.muted = false;
+	}
+	FbotonOn();
 };
 
 // function FbotonOn() {
@@ -54,8 +59,8 @@ $botonReiniciar.onclick = () => {
 // }
 
 function FbotonOn() {
-  var imagen = document.getElementById('dalePlay');
-  if (playing == 0){
+  //var imagen = document.getElementById('dalePlay');
+  if (sonido.muted){
 	  imagen.src="img/mute.png";
   }
   else imagen.src="img/play.png"; 

@@ -27,11 +27,18 @@
                     <span v-if="opponent.email != null"> vs {{ opponent.email }}</span>
                 </div>
             </a>
+			<button id="btnBajarVol" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">
+				<img id="bajarVol" src="img/bajarVol.png" width="15" height="15"></img>
+			</button>
+				
+			<button id="btnSubirVol" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">
+				<img id="subirVol" src="img/subirVol.png" width="15" height="15"></img>
+			</button>
+			
 			<button id="btnReproducir" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">
 			<img id="dalePlay" src="img/mute.png" width="30" height="30"></img>
 			</button>
-			<button id="btnPausar">bajarVol</button>
-			<button id="btnReiniciar">subirVol</button>
+
             <button v-on:click="logout" id="logout-btn" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button">Logout</button>
 			
 			<!-- <button id="btnPausar" class="btn btn-outline-secondary ml-1 my-2 my-sm-0" type="button"> -->
