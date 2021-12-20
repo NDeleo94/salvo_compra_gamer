@@ -32,11 +32,18 @@ $botonReproducir.onclick = () => {
 	
 	FbotonOn();
 };
+
 $botonPausar.onclick = () => {
-    sonido.pause();
+	// if(sonido.volume > 0){
+	// sonido.volume-= 0.25};
+	// }
+	if(sonido.volume > 0)
+		sonido.volume -= 0.25;
 };
+
 $botonReiniciar.onclick = () => {
-    sonido.currentTime = 0;
+    if(sonido.volume < 1)
+		sonido.volume += 0.25;
 };
 
 // function FbotonOn() {
